@@ -9,7 +9,6 @@ use std::fmt;
 #[derive(Debug, Clone)]
 pub struct Slack {
     hook: Url,
-    client: Client,
 }
 
 impl Slack {
@@ -17,13 +16,12 @@ impl Slack {
     pub fn new<T: reqwest::IntoUrl>(hook: T) -> Result<Slack> {
         Ok(Slack {
             hook: hook.into_url()?,
-            client: Client::new(),
         })
     }
 
     /// Send payload to slack service
-    pub fn send(&self, payload: &Payload) -> Result<()> {
-        let response = self.client.post(self.hook.clone()).json(payload).send()?;
+    pub fn send(&self, payload: &Payload, client: &Client) -> Result<()> {
+        let response = client.post(self.hook.clone()).json(payload).send()?;
 
         if response.status().is_success() {
             Ok(())
